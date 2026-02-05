@@ -100,9 +100,9 @@ class Settings(BaseSettings):
         cli_implicit_flags=True,
     )
 
-    plan: Literal["pro", "max5", "max20", "custom"] = Field(
+    plan: Literal["pro", "max5", "max20", "team_standard", "team_premium", "custom"] = Field(
         default="custom",
-        description="Plan type (pro, max5, max20, custom)",
+        description="Plan type (pro, max5, max20, team_standard, team_premium, custom)",
     )
 
     view: Literal["realtime", "daily", "monthly", "session"] = Field(
@@ -177,7 +177,7 @@ class Settings(BaseSettings):
         """Validate and normalize plan value."""
         if isinstance(v, str):
             v_lower = v.lower()
-            valid_plans = ["pro", "max5", "max20", "custom"]
+            valid_plans = ["pro", "max5", "max20", "team_standard", "team_premium", "custom"]
             if v_lower in valid_plans:
                 return v_lower
             raise ValueError(
