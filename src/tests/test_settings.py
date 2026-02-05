@@ -67,8 +67,8 @@ class TestLastUsedParams:
         with open(self.last_used.params_file) as f:
             data = json.load(f)
 
-        # Verify plan is not saved (by design)
-        assert "plan" not in data
+        # Verify plan is saved
+        assert data["plan"] == "pro"
         assert data["theme"] == "dark"
         assert data["timezone"] == "UTC"
         assert data["time_format"] == "24h"

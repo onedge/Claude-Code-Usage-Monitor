@@ -28,6 +28,7 @@ class LastUsedParams:
         """Save current settings as last used."""
         try:
             params = {
+                "plan": settings.plan,
                 "theme": settings.theme,
                 "timezone": settings.timezone,
                 "time_format": settings.time_format,
@@ -288,12 +289,22 @@ class Settings(BaseSettings):
                             cli_provided_fields.add(field_name)
 
             for key, value in last_params.items():
-                if key == "plan":
-                    continue
                 if not hasattr(settings, key):
                     continue
                 if key not in cli_provided_fields:
-                    setattr(settings, key, value)
+                    # Validate plan values before setting
+                    if key == "plan" and value is not None:
+                        from claude_monitor.core.plans import Plans
+                        if not Plans.is_valid_plan(value):
+                            logger.warning(f"Ignoring invalid saved plan: {value}")
+                            continue
+                    # Skip None values for required fields
+                    if value is None and key == "plan":
+                        continue
+                    try:
+                        setattr(settings, key, value)
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Ignoring invalid saved value for {key}: {value} ({e})")
 
             if (
                 "plan" in cli_provided_fields
